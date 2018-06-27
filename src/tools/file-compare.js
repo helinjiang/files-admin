@@ -141,9 +141,11 @@ function find(fileMd5, fileItemList) {
 }
 
 function _addInArr(fileItem, arr) {
-  if (!arr.filter(item => item === fileItem).length) {
-    arr.push(fileItem);
+  if (arr.indexOf(fileItem) > -1) {
+    return;
   }
+
+  arr.push(fileItem);
 }
 
 module.exports = {
