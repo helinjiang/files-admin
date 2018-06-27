@@ -15,10 +15,10 @@ const ProgressBar = require('progress');
 const fileSearch = require('./file-search');
 
 /**
- * 以 pathA 为基准，不在 pathA 但在 pathB 中的文件列表。
+ * 找到 pathA 和 pathB 两个路径下文件的相同和不同之处。
  *
- * @param {String} pathA 基准路径
- * @param {String} pathB 待比较路径
+ * @param {String} pathA 路径A
+ * @param {String} pathB 路径B
  * @param {Object} [options] 更多选项
  * @param {Boolean} [options.noProgressBar] 不要出现进度条
  *
@@ -42,31 +42,52 @@ function compare(pathA, pathB, options) {
       complete: '=',
       incomplete: ' ',
       width: 20,
-      total: pathBFiles.length
+      total: pathAFiles.length + pathBFiles.length
     });
   }
 
   // 数组元素为 FileItem
   let arrInBButNotInA = [];
+  let arrInAButNotInB = [];
 
   // 以 md5 为 key 值，value 为数组，数组内记录了所有相同 md5 值的 FileItem
   let arrInBoth = {};
 
+  // 循环查找 pathA
+  pathAFiles.forEach(function (fileItemA) {
+    let md5A = fileItemA.getMd5();
+    let sameMd5FileItemInPathB = find(md5A, pathBFiles);
+
+    if (!sameMd5FileItemInPathB) {
+      // 如果该 pathA 中的元素不与 pathB 中任何一个元素相同
+      arrInAButNotInB.push(fileItemA);
+    } else {
+      // 如果该 pathA 中的元素与 pathB 中任何一个元素相同
+      let arr = arrInBoth[md5A] || [];
+
+      // 以 md5 为key值，value为数组，数组内记录了所有相同 md5 值的 FileItem
+      arr.push(sameMd5FileItemInPathB);
+      arr.push(fileItemA);
+
+      // 数组中的文件排序一下，使得相近路径的文件靠在一起，便于观看结果
+      arr.sort(function (item1, item2) {
+        return item1.fullPath > item2.fullPath;
+      });
+
+      // 设置回来
+      arrInBoth[md5A] = arr;
+    }
+
+    // 进度条
+    if (progressBar) {
+      progressBar.tick();
+    }
+  });
+
   // 循环查找 pathB
   pathBFiles.forEach(function (fileItemB) {
     let md5B = fileItemB.getMd5();
-    let sameMd5FileItemInPathA;
-
-    for (let i = 0, length = pathAFiles.length; i < length; i++) {
-      let fileItemA = pathAFiles[i];
-      let md5A = fileItemA.getMd5();
-
-      // 如果找到了相同的，则停止
-      if (md5A === md5B) {
-        sameMd5FileItemInPathA = fileItemA;
-        break;
-      }
-    }
+    let sameMd5FileItemInPathA = find(md5B, pathAFiles);
 
     if (!sameMd5FileItemInPathA) {
       // 如果该 pathB 中的元素不与 pathA 中任何一个元素相同
@@ -95,11 +116,37 @@ function compare(pathA, pathB, options) {
   });
 
   return {
-    different: arrInBButNotInA,
-    same: arrInBoth
+    onlyInA: arrInAButNotInB,
+    onlyInB: arrInBButNotInA,
+    both: arrInBoth
   };
 }
 
+/**
+ * 找到一个 md5 文件是否在某些文件列表中
+ *
+ * @param {String} fileMd5 文件的md5值
+ * @param {FileItem[]} fileItemList 文件列表
+ * @returns {FileItem}
+ */
+function find(fileMd5, fileItemList) {
+  let sameMd5FileItem;
+
+  for (let i = 0, length = fileItemList.length; i < length; i++) {
+    let fileItem = fileItemList[i];
+    let curFileMd5 = fileItem.getMd5();
+
+    // 如果找到了相同的，则停止
+    if (curFileMd5 === fileMd5) {
+      sameMd5FileItem = fileItem;
+      break;
+    }
+  }
+
+  return sameMd5FileItem;
+}
+
 module.exports = {
-  compare: compare
+  compare: compare,
+  find: find,
 };
