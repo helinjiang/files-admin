@@ -1,0 +1,23 @@
+{
+  "name": "files-admin",
+  "version": "0.1.0",
+  "description": "Manage files by Node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helinjiang/files-admin.git"
+  },
+  "keywords": [
+    "files",
+    "admin"
+  ],
+  "author": "helinjiang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/helinjiang/files-admin/issues"
+  },
+  "homepage": "https://github.com/helinjiang/files-admin#readme"
+}
