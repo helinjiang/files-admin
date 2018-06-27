@@ -11,13 +11,8 @@
  *
  */
 
-var path = require('path');
-var _ = require('lodash');
-var Promise = require('bluebird');
-var fse = Promise.promisifyAll(require('fs-extra'));
-var ProgressBar = require('progress');
-
-var ft = require('./file-tool');
+const ProgressBar = require('progress');
+const fileSearch = require('./file-search');
 
 /**
  * 以 pathA 为基准，不在 pathA 但在 pathB 中的文件列表。
@@ -30,73 +25,81 @@ var ft = require('./file-tool');
  * @return {Object}
  */
 function compare(pathA, pathB, options) {
-    var pathAFiles = ft.getAllFiles(pathA),
-        pathBFiles = ft.getAllFiles(pathB);
+  const pathAFiles = fileSearch.getAllFiles(pathA);
+  const pathBFiles = fileSearch.getAllFiles(pathB);
 
-    if (!options) {
-        options = {
-            noProgressBar: false
-        };
+  // 默认展示进度条
+  if (!options) {
+    options = {
+      noProgressBar: false
+    };
+  }
+
+  // 进度条
+  let progressBar;
+  if (!options.noProgressBar) {
+    progressBar = new ProgressBar('compare [:bar] :current/:total :percent(:etas) , already cost :elapseds ', {
+      complete: '=',
+      incomplete: ' ',
+      width: 20,
+      total: pathBFiles.length
+    });
+  }
+
+  // 数组元素为 FileItem
+  let arrInBButNotInA = [];
+
+  // 以 md5 为 key 值，value 为数组，数组内记录了所有相同 md5 值的 FileItem
+  let arrInBoth = {};
+
+  // 循环查找 pathB
+  pathBFiles.forEach(function (fileItemB) {
+    let md5B = fileItemB.getMd5();
+    let sameMd5FileItemInPathA;
+
+    for (let i = 0, length = pathAFiles.length; i < length; i++) {
+      let fileItemA = pathAFiles[i];
+      let md5A = fileItemA.getMd5();
+
+      // 如果找到了相同的，则停止
+      if (md5A === md5B) {
+        sameMd5FileItemInPathA = fileItemA;
+        break;
+      }
+    }
+
+    if (!sameMd5FileItemInPathA) {
+      // 如果该 pathB 中的元素不与 pathA 中任何一个元素相同
+      arrInBButNotInA.push(fileItemB);
+    } else {
+      // 如果该 pathB 中的元素与 pathA 中任何一个元素相同
+      let arr = arrInBoth[md5B] || [];
+
+      // 以 md5 为key值，value为数组，数组内记录了所有相同 md5 值的 FileItem
+      arr.push(sameMd5FileItemInPathA);
+      arr.push(fileItemB);
+
+      // 数组中的文件排序一下，使得相近路径的文件靠在一起，便于观看结果
+      arr.sort(function (item1, item2) {
+        return item1.fullPath > item2.fullPath;
+      });
+
+      // 设置回来
+      arrInBoth[md5B] = arr;
     }
 
     // 进度条
-    if (!options.noProgressBar) {
-        var bar = new ProgressBar('compare [:bar] :current/:total :percent(:etas) , already cost :elapseds ', {
-            complete: '=',
-            incomplete: ' ',
-            width: 20,
-            total: pathBFiles.length
-        });
+    if (progressBar) {
+      progressBar.tick();
     }
+  });
 
-    var arrInBButNotInA = [];
-    var arrInBoth = {};
-
-    pathBFiles.forEach(function (fileItemB) {
-        var md5B = fileItemB.getMd5(),
-            isInBoth = false;
-
-        for (var i = 0, length = pathAFiles.length; i < length; i++) {
-            var fileItemA = pathAFiles[i],
-                md5A = fileItemA.getMd5();
-
-            // 如果找到了相同的，则停止
-            if (md5A == md5B) {
-                isInBoth = true;
-                break;
-            }
-        }
-
-        if (!isInBoth) {
-            arrInBButNotInA.push(fileItemB);
-        } else {
-            var arr = arrInBoth[md5A];
-            if (!arr) {
-                arr = [];
-                arr.push(fileItemA);
-            }
-
-            arr.push(fileItemB);
-
-            arr.sort(function (item1, item2) {
-                return item1.fullPath > item2.fullPath;
-            });
-
-            arrInBoth[md5A] = arr;
-        }
-
-        // 进度条
-        if (!options.noProgressBar) {
-            bar.tick();
-        }
-    });
-
-    return {
-        different: arrInBButNotInA,
-        same: arrInBoth
-    };
+  return {
+    different: arrInBButNotInA,
+    same: arrInBoth
+  };
 }
 
 module.exports = {
-    compare: compare
+  compare: compare
 };
