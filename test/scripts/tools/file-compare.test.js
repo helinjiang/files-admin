@@ -16,18 +16,18 @@ describe('校验 tools/file-compare.js', function () {
       expect(compareResult).to.be.an('object').and.have.all.keys('onlyInA', 'onlyInB', 'both');
     });
 
-    // it('文件比较之后：有两个文件只存在于b中', function () {
-    //   expect(compareResult).to.have.property('different')
-    //     .that.is.an('array')
-    //     .that.to.have.lengthOf(2);
-    // });
-    //
-    // it('文件比较之后：只存在于b中的文件分别为 compare-2.txt 和 compare-5.txt', function () {
-    //   expect(compareResult['different'].map(function (item) {
-    //     return item.relativePath;
-    //   })).to.same.members(['compare-2.txt', 'compare-5.txt']);
-    // });
-    //
+    it('有两个文件只存在于b中', function () {
+      expect(compareResult).to.have.property('onlyInB')
+        .that.is.an('array')
+        .that.to.have.lengthOf(3);
+    });
+
+    it('只存在于b中的文件分别为 compare-2.txt 和 compare-5.txt', function () {
+      expect(compareResult['onlyInB'].map(function (item) {
+        return item.relativePath;
+      })).to.have.same.members(['compare-2-different-md5.txt', 'compare-5.txt', 'subdir/compare-6.txt']);
+    });
+
     // it('文件比较之后：有两个文件同时存在a和b中', function () {
     //   expect(compareResult).to.have.property('same')
     //     .that.is.an('object')
