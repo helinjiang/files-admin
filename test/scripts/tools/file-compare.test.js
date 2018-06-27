@@ -28,20 +28,20 @@ describe('校验 tools/file-compare.js', function () {
       })).to.have.same.members(['compare-2-different-md5.txt', 'compare-5.txt', 'subdir/compare-6.txt']);
     });
 
-    // it('文件比较之后：有两个文件同时存在a和b中', function () {
-    //   expect(compareResult).to.have.property('same')
-    //     .that.is.an('object')
-    //     .that.to.include.keys('27dc180b57d8f177e10998cbd0a9894f')
-    //     .that.to.include.keys('e5fd0cedc7d0613169eb6986801e86e5');
-    // });
-    //
-    // it('文件比较之后：27dc180b57d8f177e10998cbd0a9894f 对应三条记录', function () {
-    //   expect(Object.keys(compareResult.same['27dc180b57d8f177e10998cbd0a9894f'])).to.have.lengthOf(3);
-    // });
-    //
-    // it('文件比较之后：e5fd0cedc7d0613169eb6986801e86e5 对应两条记录', function () {
-    //   expect(Object.keys(compareResult.same['e5fd0cedc7d0613169eb6986801e86e5'])).to.have.lengthOf(2);
-    // });
+    it('文件比较之后：有两个文件同时存在a和b中', function () {
+      expect(compareResult).to.have.property('both')
+        .that.is.an('object')
+        .that.to.include.keys('d6449191e61e5d22913d261d1938ca9b')
+        .that.to.include.keys('e820a3de6b926b0bbe84b781f3aee457');
+    });
+
+    it('文件比较之后：d6449191e61e5d22913d261d1938ca9b 对应三条记录', function () {
+      expect(compareResult.both['d6449191e61e5d22913d261d1938ca9b']).to.have.lengthOf(2);
+    });
+
+    it('文件比较之后：e820a3de6b926b0bbe84b781f3aee457 对应两条记录', function () {
+      expect(compareResult.both['e820a3de6b926b0bbe84b781f3aee457']).to.have.lengthOf(4);
+    });
 
   });
 });
