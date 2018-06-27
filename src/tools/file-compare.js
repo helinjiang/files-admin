@@ -66,13 +66,8 @@ function compare(pathA, pathB, options) {
       let arr = arrInBoth[md5A] || [];
 
       // 以 md5 为key值，value为数组，数组内记录了所有相同 md5 值的 FileItem
-      arr.push(sameMd5FileItemInPathB);
-      arr.push(fileItemA);
-
-      // 数组中的文件排序一下，使得相近路径的文件靠在一起，便于观看结果
-      arr.sort(function (item1, item2) {
-        return item1.fullPath > item2.fullPath;
-      });
+      _addInArr(sameMd5FileItemInPathB, arr);
+      _addInArr(fileItemA, arr);
 
       // 设置回来
       arrInBoth[md5A] = arr;
@@ -97,13 +92,8 @@ function compare(pathA, pathB, options) {
       let arr = arrInBoth[md5B] || [];
 
       // 以 md5 为key值，value为数组，数组内记录了所有相同 md5 值的 FileItem
-      arr.push(sameMd5FileItemInPathA);
-      arr.push(fileItemB);
-
-      // 数组中的文件排序一下，使得相近路径的文件靠在一起，便于观看结果
-      arr.sort(function (item1, item2) {
-        return item1.fullPath > item2.fullPath;
-      });
+      _addInArr(sameMd5FileItemInPathA, arr);
+      _addInArr(fileItemB, arr);
 
       // 设置回来
       arrInBoth[md5B] = arr;
@@ -115,9 +105,13 @@ function compare(pathA, pathB, options) {
     }
   });
 
+  const sortFileItem = function (item1, item2) {
+    return item1.fullPath > item2.fullPath;
+  };
+
   return {
-    onlyInA: arrInAButNotInB,
-    onlyInB: arrInBButNotInA,
+    onlyInA: arrInAButNotInB.sort(sortFileItem),
+    onlyInB: arrInBButNotInA.sort(sortFileItem),
     both: arrInBoth
   };
 }
@@ -146,7 +140,13 @@ function find(fileMd5, fileItemList) {
   return sameMd5FileItem;
 }
 
+function _addInArr(fileItem, arr) {
+  if (!arr.filter(item => item === fileItem).length) {
+    arr.push(fileItem);
+  }
+}
+
 module.exports = {
   compare: compare,
-  find: find,
+  find: find
 };
