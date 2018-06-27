@@ -2,7 +2,7 @@
   "name": "files-admin",
   "version": "0.1.0",
   "description": "Manage files by Node",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/helinjiang/files-admin/issues"
   },
-  "homepage": "https://github.com/helinjiang/files-admin#readme"
+  "homepage": "https://github.com/helinjiang/files-admin#readme",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "fs-handler": "^0.1.2"
+  }
 }
