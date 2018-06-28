@@ -8,10 +8,9 @@
  *
  */
 
-var path = require('path');
-var ProgressBar = require('progress');
+const ProgressBar = require('progress');
 
-var fileSearch = require('./file-search');
+const fileSearch = require('./file-search');
 
 /**
  * 获得某路径下所有同名的重复文件信息。

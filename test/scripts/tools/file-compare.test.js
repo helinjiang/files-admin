@@ -5,7 +5,13 @@ const expect = require('chai').expect;
 const dataBasePath = path.resolve(__dirname, '../../data/fixtures/compare');
 
 describe('校验 tools/file-compare.js', function () {
-  describe('文件比较：找出 a 和 b 文件夹内的相同和不同的文件', function () {
+  describe('基础检查', function () {
+    it('对外提供了2个方法和属性', function () {
+      expect(fileCompare).to.have.all.keys('compare', 'find');
+    });
+  });
+
+  describe('compare(pathA, pathB, options)', function () {
     var compareResult;
 
     before(function () {
