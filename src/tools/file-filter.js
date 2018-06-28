@@ -1,7 +1,8 @@
 /**
  * 文件过滤。
  *
- * 最典型的场景就是我们的相片，可能保存了好几份（在同一个目录不同命名或者不同目录），我们需要将重复的过滤。
+ * 最典型的场景就是我们的相片，可能保存了好几份（在同一个目录不同命名或者不同目录），
+ * 我们需要按照一定的规则，将重复的过滤出来。
  *
  * @author helinjiang
  *
@@ -10,7 +11,7 @@
 var path = require('path');
 var ProgressBar = require('progress');
 
-var ft = require('./file-tool');
+var fileSearch = require('./file-search');
 
 /**
  * 获得某路径下所有同名的重复文件信息。
@@ -23,7 +24,7 @@ var ft = require('./file-tool');
  *
  */
 function filterByName(sourcePath, options) {
-    return _filter(ft.getAllFiles(sourcePath), 'fileName', options);
+    return _filter(fileSearch.getAllFiles(sourcePath), 'fileName', options);
 }
 
 /**
@@ -33,10 +34,10 @@ function filterByName(sourcePath, options) {
  * @param {Object} [options] 更多选项
  * @param {Boolean} [options.noProgressBar] 不要出现进度条
  *
- * @return {Object} 结果 {fileName: [FileItem, FileItem], fileName: [FileItem, FileItem]}
+ * @return {Object} 结果 {size: [FileItem, FileItem], size: [FileItem, FileItem]}
  */
 function filterBySize(sourcePath, options) {
-    return _filter(ft.getAllFiles(sourcePath), 'size', options);
+    return _filter(fileSearch.getAllFiles(sourcePath), 'size', options);
 }
 
 /**
@@ -46,20 +47,23 @@ function filterBySize(sourcePath, options) {
  * @param {Object} [options] 更多选项
  * @param {Boolean} [options.noProgressBar] 不要出现进度条
  *
- * @return {Object} 结果 {fileName: [FileItem, FileItem], fileName: [FileItem, FileItem]}
+ * @return {Object} 结果 {time: [FileItem, FileItem], time: [FileItem, FileItem]}
  */
 function filterByTime(sourcePath, options) {
-    return _filter(ft.getAllFiles(sourcePath), 'mtime', options);
+    return _filter(fileSearch.getAllFiles(sourcePath), 'mtime', options);
 }
 
 /**
  * 获得某路径下所有相同文件MD5的重复文件信息。
  *
  * @param {String} sourcePath 路径
- * @return {Object} 结果 {fileName: [FileItem, FileItem], fileName: [FileItem, FileItem]}
+ * @param {Object} [options] 更多选项
+ * @param {Boolean} [options.noProgressBar] 不要出现进度条
+ *
+ * @return {Object} 结果 {md5: [FileItem, FileItem], md5: [FileItem, FileItem]}
  */
 function filterByMd5(sourcePath, options) {
-    return _filter(ft.getAllFiles(sourcePath), 'md5', options);
+    return _filter(fileSearch.getAllFiles(sourcePath), 'md5', options);
 }
 
 /**
@@ -73,14 +77,15 @@ function filterByMd5(sourcePath, options) {
  * @private
  */
 function _filter(fileArr, filterKey, options) {
-    var map = {},
-        multiNameArr = [],
-        result = {};
+    let map = {};
+    let multiNameArr = [];
+    let result = {};
 
     if (['fileName', 'size', 'mtime', 'md5'].indexOf(filterKey) < 0) {
         return result;
     }
 
+    // 默认展示进度条
     if (!options) {
         options = {
             noProgressBar: false
@@ -88,8 +93,9 @@ function _filter(fileArr, filterKey, options) {
     }
 
     // 进度条
+    let progressBar;
     if (!options.noProgressBar) {
-        var bar = new ProgressBar('filtering [:bar] :current/:total :percent(:etas) , already cost :elapseds ', {
+        progressBar = new ProgressBar('filtering [:bar] :current/:total :percent(:etas) , already cost :elapseds ', {
             complete: '=',
             incomplete: ' ',
             width: 20,
@@ -99,7 +105,7 @@ function _filter(fileArr, filterKey, options) {
 
     // 获取 map 和 multiNameArr
     fileArr.forEach(function (fileItem) {
-        var fileName;
+        let fileName;
 
         if (filterKey === 'md5') {
             // 注意，如果文件比较多的话，此处每个文件做hash会比较耗时，尤其是文件也相对比较大时，情况更严重
@@ -111,12 +117,7 @@ function _filter(fileArr, filterKey, options) {
             fileName = fileItem[filterKey] + '';
         }
 
-        var arr = map[fileName];
-
-        // 初始化
-        if (!arr) {
-            arr = [];
-        }
+        let arr = map[fileName] || [];
 
         arr.push(fileItem);
 
@@ -128,8 +129,8 @@ function _filter(fileArr, filterKey, options) {
         }
 
         // 进度条
-        if (!options.noProgressBar) {
-            bar.tick();
+        if (progressBar) {
+            progressBar.tick();
         }
     });
 
