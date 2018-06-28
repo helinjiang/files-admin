@@ -11,7 +11,7 @@ const fse = require('fs-extra');
 
 const fileSearch = require('./file-search');
 
-function saveJsonMd5(sourcePath, savePath, options) {
+function saveJsonMd5(sourcePath, saveFullPath, options) {
   let fileArr = fileSearch.getAllFiles(sourcePath);
 
   let map = {};
@@ -70,7 +70,7 @@ function saveJsonMd5(sourcePath, savePath, options) {
     multiArr: multiNameArr
   };
 
-  return fse.outputJson(path.join(savePath, 'scan-data.json'), result)
+  return fse.outputJson(saveFullPath, result)
     .then(function () {
       return result;
     });

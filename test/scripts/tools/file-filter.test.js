@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 
 const dataBasePath = path.resolve(__dirname, '../../data/fixtures/filter');
 
-describe.only('校验 tools/file-filter.js', function () {
+describe('校验 tools/file-filter.js', function () {
 
   describe('基础检查', function () {
     it('对外提供了四个方法和属性', function () {
@@ -19,7 +19,7 @@ describe.only('校验 tools/file-filter.js', function () {
       filterResult = fileFilter.filterByName(path.join(dataBasePath, './same-name'), { noProgressBar: true });
     });
 
-    it('文件比较操作完成', function () {
+    it('文件过滤操作完成', function () {
       expect(filterResult).to.be.an('object').and.have.all.keys('unique-1.txt');
     });
 
@@ -43,7 +43,7 @@ describe.only('校验 tools/file-filter.js', function () {
       filterResult = fileFilter.filterBySize(path.join(dataBasePath, './same-size'), { noProgressBar: true });
     });
 
-    it('文件比较操作完成', function () {
+    it('文件过滤操作完成', function () {
       expect(filterResult).to.be.an('object').and.have.all.keys('13');
     });
 
@@ -67,7 +67,7 @@ describe.only('校验 tools/file-filter.js', function () {
       filterResult = fileFilter.filterByTime(path.join(dataBasePath, './same-time'), { noProgressBar: true });
     });
 
-    it('文件比较操作完成', function () {
+    it('文件过滤操作完成', function () {
       expect(filterResult).to.be.an('object').and.have.all.keys('1530111854831');
     });
 
@@ -91,7 +91,7 @@ describe.only('校验 tools/file-filter.js', function () {
       filterResult = fileFilter.filterByMd5(path.join(dataBasePath, './same-md5'), { noProgressBar: true });
     });
 
-    it('文件比较操作完成', function () {
+    it('文件过滤操作完成', function () {
       expect(filterResult).to.be.an('object').and.have.all.keys('dfb875049cd98cf8bb32ea8d6333b367');
     });
 
