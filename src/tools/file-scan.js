@@ -7,10 +7,11 @@
 
 const path = require('path');
 const ProgressBar = require('progress');
+const fse = require('fs-extra');
 
 const fileSearch = require('./file-search');
 
-function saveJsonMd5(sourcePath, options) {
+function saveJsonMd5(sourcePath, savePath, options) {
   let fileArr = fileSearch.getAllFiles(sourcePath);
 
   let map = {};
@@ -69,7 +70,7 @@ function saveJsonMd5(sourcePath, options) {
     multiArr: multiNameArr
   };
 
-  return fse.outputJsonAsync(path.join(sourcePath, 'data.json'), result)
+  return fse.outputJson(path.join(savePath, 'scan-data.json'), result)
     .then(function () {
       return result;
     });

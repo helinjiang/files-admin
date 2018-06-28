@@ -1,30 +1,30 @@
 {
-  "basePath": "./test/data/fixtures/save/md5",
+  "basePath": "D:\\gitprojects\\files-admin\\test\\data\\fixtures\\scan\\md5",
   "map": {
     "dfb875049cd98cf8bb32ea8d6333b367": [
       {
         "p": "unique-md5-1-same.txt",
         "s": 13,
-        "t": 1481873229622
+        "t": 1530111854847
       },
       {
         "p": "unique-md5-1.txt",
         "s": 13,
-        "t": 1481873229622
+        "t": 1530111854847
       }
     ],
-    "1fd67d43afbe380306a2320bdf2f01c8": [
+    "139523c29fc1055cc31bc915e562aabd": [
       {
         "p": "unique-md5-2.txt",
-        "s": 13,
-        "t": 1481874676053
+        "s": 39,
+        "t": 1530202540951
       }
     ],
-    "8ec1beef542f3af0eb9e95b21a203c6e": [
+    "2c0f2c09d44d9b076bb141c47c296e36": [
       {
         "p": "unique-md5-3.txt",
-        "s": 13,
-        "t": 1481874668297
+        "s": 38,
+        "t": 1530202540951
       }
     ]
   },
