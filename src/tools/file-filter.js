@@ -23,7 +23,7 @@ const fileSearch = require('./file-search');
  *
  */
 function filterByName(sourcePath, options) {
-    return _filter(fileSearch.getAllFiles(sourcePath), 'fileName', options);
+  return _filter(fileSearch.getAllFiles(sourcePath), 'fileName', options);
 }
 
 /**
@@ -36,7 +36,7 @@ function filterByName(sourcePath, options) {
  * @return {Object} 结果 {size: [FileItem, FileItem], size: [FileItem, FileItem]}
  */
 function filterBySize(sourcePath, options) {
-    return _filter(fileSearch.getAllFiles(sourcePath), 'size', options);
+  return _filter(fileSearch.getAllFiles(sourcePath), 'size', options);
 }
 
 /**
@@ -49,7 +49,7 @@ function filterBySize(sourcePath, options) {
  * @return {Object} 结果 {time: [FileItem, FileItem], time: [FileItem, FileItem]}
  */
 function filterByTime(sourcePath, options) {
-    return _filter(fileSearch.getAllFiles(sourcePath), 'mtime', options);
+  return _filter(fileSearch.getAllFiles(sourcePath), 'mtime', options);
 }
 
 /**
@@ -62,7 +62,7 @@ function filterByTime(sourcePath, options) {
  * @return {Object} 结果 {md5: [FileItem, FileItem], md5: [FileItem, FileItem]}
  */
 function filterByMd5(sourcePath, options) {
-    return _filter(fileSearch.getAllFiles(sourcePath), 'md5', options);
+  return _filter(fileSearch.getAllFiles(sourcePath), 'md5', options);
 }
 
 /**
@@ -76,74 +76,74 @@ function filterByMd5(sourcePath, options) {
  * @private
  */
 function _filter(fileArr, filterKey, options) {
-    let map = {};
-    let multiNameArr = [];
-    let result = {};
+  let map = {};
+  let multiNameArr = [];
+  let result = {};
 
-    if (['fileName', 'size', 'mtime', 'md5'].indexOf(filterKey) < 0) {
-        return result;
+  if (['fileName', 'size', 'mtime', 'md5'].indexOf(filterKey) < 0) {
+    return result;
+  }
+
+  // 默认展示进度条
+  if (!options) {
+    options = {
+      noProgressBar: false
+    };
+  }
+
+  // 进度条
+  let progressBar;
+  if (!options.noProgressBar) {
+    progressBar = new ProgressBar('filtering [:bar] :current/:total :percent(:etas) , already cost :elapseds ', {
+      complete: '=',
+      incomplete: ' ',
+      width: 20,
+      total: fileArr.length
+    });
+  }
+
+  // 获取 map 和 multiNameArr
+  fileArr.forEach(function (fileItem) {
+    let fileName;
+
+    if (filterKey === 'md5') {
+      // 注意，如果文件比较多的话，此处每个文件做hash会比较耗时，尤其是文件也相对比较大时，情况更严重
+      // 尝试过遍历包含703张图片，结果耗时189.3s图片，平均一张耗时：269ms;
+      // 10M的视频400ms左右；1.55M图片126ms
+      // 10M的视频290ms左右；1.55M图片50ms
+      fileName = fileItem.getMd5() + '';
+    } else {
+      fileName = fileItem[filterKey] + '';
     }
 
-    // 默认展示进度条
-    if (!options) {
-        options = {
-            noProgressBar: false
-        };
+    let arr = map[fileName] || [];
+
+    arr.push(fileItem);
+
+    map[fileName] = arr;
+
+    // 判断是否已经有重名的文件了
+    if (arr.length > 1) {
+      multiNameArr.push(fileName);
     }
 
     // 进度条
-    let progressBar;
-    if (!options.noProgressBar) {
-        progressBar = new ProgressBar('filtering [:bar] :current/:total :percent(:etas) , already cost :elapseds ', {
-            complete: '=',
-            incomplete: ' ',
-            width: 20,
-            total: fileArr.length
-        });
+    if (progressBar) {
+      progressBar.tick();
     }
+  });
 
-    // 获取 map 和 multiNameArr
-    fileArr.forEach(function (fileItem) {
-        let fileName;
+  // 返回重复的文件map
+  multiNameArr.forEach(function (fileName) {
+    result[fileName] = map[fileName];
+  });
 
-        if (filterKey === 'md5') {
-            // 注意，如果文件比较多的话，此处每个文件做hash会比较耗时，尤其是文件也相对比较大时，情况更严重
-            // 尝试过遍历包含703张图片，结果耗时189.3s图片，平均一张耗时：269ms;
-            // 10M的视频400ms左右；1.55M图片126ms
-            // 10M的视频290ms左右；1.55M图片50ms
-            fileName = fileItem.getMd5() + '';
-        } else {
-            fileName = fileItem[filterKey] + '';
-        }
-
-        let arr = map[fileName] || [];
-
-        arr.push(fileItem);
-
-        map[fileName] = arr;
-
-        // 判断是否已经有重名的文件了
-        if (arr.length > 1) {
-            multiNameArr.push(fileName);
-        }
-
-        // 进度条
-        if (progressBar) {
-            progressBar.tick();
-        }
-    });
-
-    // 返回重复的文件map
-    multiNameArr.forEach(function (fileName) {
-        result[fileName] = map[fileName];
-    });
-
-    return result;
+  return result;
 }
 
 module.exports = {
-    filterByName: filterByName,
-    filterBySize: filterBySize,
-    filterByTime: filterByTime,
-    filterByMd5: filterByMd5
+  filterByName: filterByName,
+  filterBySize: filterBySize,
+  filterByTime: filterByTime,
+  filterByMd5: filterByMd5
 };
