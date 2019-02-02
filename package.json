@@ -2,9 +2,16 @@
   "name": "files-admin",
   "version": "0.2.0",
   "description": "Manage files by Node",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "mocha"
+    "prepublishOnly": "npm run build",
+    "build": "babel --presets env,stage-0 src/ --out-dir lib/ --source-maps",
+    "watch-compile": "npm run build -- --watch",
+    "watch": "npm run watch-compile",
+    "test-mocha": "node ./node_modules/mocha/bin/_mocha",
+    "test": "npm run eslint && npm run test-cov",
+    "eslint": "eslint src/",
+    "test-cov": "istanbul cover ./node_modules/mocha/bin/_mocha"
   },
   "repository": {
     "type": "git",
@@ -26,7 +33,12 @@
     "progress": "^2.0.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^10.0.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "chai": "^4.2.0",
+    "eslint": "^5.7.0",
     "mocha": "^5.2.0"
   }
 }
