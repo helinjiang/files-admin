@@ -67,9 +67,9 @@ class FileItem {
         // 缓存结果，不需要每次获取都重新去计算
         if (!this._md5) {
             try {
-                this._md5 = hash.getHashOfFile(this.fullPath);
+                this._md5 = hash.getHashOfFile(this.getFullPath());
             } catch (err) {
-                console.error('get md5 err', this.fullPath, err);
+                console.error('get md5 err', this.getFullPath(), err);
             }
         }
 

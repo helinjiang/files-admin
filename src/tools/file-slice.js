@@ -59,7 +59,7 @@ function slice(sourcePath, destPath, groupNum, options) {
 
         // 循环一个一个文件拷贝
         curGroupFileArr.forEach(function (item) {
-            var from = item.fullPath,
+            var from = item.getFullPath(),
                 to = path.join(savePath, item.fileName);
 
             // console.log('Next to copy ' + from + ' to ' + to + ' ...');

@@ -106,7 +106,7 @@ function compare(pathA, pathB, options) {
   });
 
   const sortFileItem = function (item1, item2) {
-    return item1.fullPath > item2.fullPath;
+    return item1.getFullPath() > item2.getFullPath();
   };
 
   return {
