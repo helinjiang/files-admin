@@ -1,7 +1,6 @@
-const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-class DB {
+class DBFiles {
     constructor(dbFilePath) {
         this.dbFilePath = dbFilePath;
 
@@ -23,7 +22,8 @@ class DB {
                  "mode" TEXT,
                  "size" INTEGER,
                  "mtime" INTEGER,
-                 "isDirectory" INTEGER
+                 "isDirectory" INTEGER,
+                 "lastModify" INTEGER
             )`);
 
             console.log(`数据表： ${this.TABLE_NAME} 创建成功！`);
@@ -31,28 +31,28 @@ class DB {
         });
     }
 
-    addFileItem(datas) {
+    add(datas) {
         // 兼容列表和单个元素的场景
         let list = Array.isArray(datas) ? datas : [datas];
 
         console.log(`\n准备插入${list.length}条数据`);
-        console.time('addFileItem');
+        console.time('add');
 
         this._run(() => {
-            const stmt = this.sqliteDB.prepare(`INSERT INTO ${this.TABLE_NAME} (md5,relativePath,mode,size,mtime,isDirectory) VALUES (?,?,?,?,?,?)`);
+            const stmt = this.sqliteDB.prepare(`INSERT INTO ${this.TABLE_NAME} (md5,relativePath,mode,size,mtime,isDirectory,lastModify) VALUES (?,?,?,?,?,?,?)`);
 
             list.forEach((item) => {
-                stmt.run(item.getMd5(), item.relativePath, item.mode, item.size, item.mtime, item.isDirectory ? 1 : 0);
+                stmt.run(item.getMd5(), item.relativePath, item.mode, item.size, item.mtime, item.isDirectory ? 1 : 0, Date.now());
             });
 
             stmt.finalize();
 
             console.log(`已成功插入${list.length}条数据！`);
-            console.timeEnd('addFileItem');
+            console.timeEnd('add');
         });
     }
 
-    getFileItem(callback) {
+    query(callback) {
         this._run(() => {
             // function (err, rows)
             this.sqliteDB.all(`SELECT * FROM ${this.TABLE_NAME}`, callback);
@@ -70,4 +70,4 @@ class DB {
     }
 }
 
-module.exports = DB;
+module.exports = DBFiles;
