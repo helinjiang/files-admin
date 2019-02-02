@@ -12,11 +12,11 @@ const FileItem = require('../model/FileItem');
  * @returns {FileItem[]}
  */
 function getAllFiles(targetPath) {
-  return fsHandler.search.getAllFiles(targetPath).map((entry) => {
-    return new FileItem(entry, entry.isDirectory());
-  });
+    return fsHandler.search.getAllFiles(targetPath).map((entry) => {
+        return new FileItem(entry, entry.isDirectory());
+    });
 }
 
 module.exports = {
-  getAllFiles: getAllFiles
+    getAllFiles: getAllFiles
 };

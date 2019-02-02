@@ -24,9 +24,17 @@ $ npm install files-admin
 | `size` | 文件大小 | |
 | `mtime` | 文件最后修改时间 | |
 | `isDirectory` | 是否为目录 | |
-| `fileName` | 文件名字 | |
-| `fullPath` | 文件的绝对路径 | |
-| `_md5` | 文件MD5值 | 计算MD5值是需要时间的 |
+| `_fileName` | 文件名字 | 仅做缓存 |
+| `_fullPath` | 文件的绝对路径 | 仅做缓存 |
+| `_md5` | 文件MD5值 | 仅做缓存，计算MD5值是需要时间的 |
+
+#### 方法：getFileName()
+
+获得文件名字。
+
+#### 方法：getFullPath()
+
+获得文件绝对路径。
 
 #### 方法：getMd5()
 
@@ -34,3 +42,7 @@ $ npm install files-admin
 
 - 如果是文件夹则返回空值。
 - 重复调用时会从缓存中获取，只计算一次。
+
+## fileSearch.getAllFiles(targetPath)
+
+获得某路径下所有的文件，返回一个列表，元素为 `FileItem` 。
