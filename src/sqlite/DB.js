@@ -46,6 +46,13 @@ class DB {
         });
     }
 
+    getFileItem(callback) {
+        this._run(() => {
+            // function (err, rows)
+            this.sqliteDB.all(`SELECT * FROM ${this.TABLE_NAME}`, callback);
+        });
+    }
+
     _run(runCall) {
         const self = this;
 
