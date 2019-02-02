@@ -6,16 +6,20 @@ const dbFilePath = path.resolve(__dirname, '../data/db.sqlite3');
 const db = new DB(dbFilePath);
 // console.log(db.createTable());
 // db.createTable();
-
-// const fileSearch = require('../src/tools/file-search');
 //
-// const dataBasePath = path.resolve(__dirname, '../test/data/fixtures/');
+const fileSearch = require('../src/tools/file-search');
 
-// const result = fileSearch.getAllFiles(dataBasePath);
-// console.log(result.length);
+const dataBasePath = path.resolve(__dirname, '../test/data/fixtures/');
 
-// db.addFileItem(result);
+const result = fileSearch.getAllFiles(dataBasePath);
+console.log(result);
+// console.log(result.map((item)=>{
+//     item.getMd5()
+//     return item;
+// }));
 
-db.getFileItem((err, datas) => {
-    console.log(err, datas);
-});
+db.addFileItem(result);
+
+// db.getFileItem((err, datas) => {
+//     console.log(err, datas);
+// });

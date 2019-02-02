@@ -12,6 +12,9 @@ class DB {
     }
 
     createTable() {
+        console.log(`\n准备创建数据表： ${this.TABLE_NAME}`);
+        console.time('createTable');
+
         this._run(() => {
             this.sqliteDB.run(`create table if not exists ${this.TABLE_NAME} (
                  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -22,6 +25,9 @@ class DB {
                  "mtime" INTEGER,
                  "isDirectory" INTEGER
             )`);
+
+            console.log(`数据表： ${this.TABLE_NAME} 创建成功！`);
+            console.timeEnd('createTable');
         });
     }
 
@@ -29,19 +35,19 @@ class DB {
         // 兼容列表和单个元素的场景
         let list = Array.isArray(datas) ? datas : [datas];
 
-        console.log('--addFileItem-- list length', list.length);
+        console.log(`\n准备插入${list.length}条数据`);
         console.time('addFileItem');
 
         this._run(() => {
             const stmt = this.sqliteDB.prepare(`INSERT INTO ${this.TABLE_NAME} (md5,relativePath,mode,size,mtime,isDirectory) VALUES (?,?,?,?,?,?)`);
 
             list.forEach((item) => {
-                stmt.run(item._md5, item.relativePath, item.mode, item.size, item.mtime, item.isDirectory ? 1 : 0);
+                stmt.run(item.getMd5(), item.relativePath, item.mode, item.size, item.mtime, item.isDirectory ? 1 : 0);
             });
 
             stmt.finalize();
 
-            console.log('--addFileItem-- success!');
+            console.log(`已成功插入${list.length}条数据！`);
             console.timeEnd('addFileItem');
         });
     }
